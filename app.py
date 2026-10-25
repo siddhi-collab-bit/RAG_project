@@ -1,3 +1,4 @@
+pip install -q streamlit
 import os
 import tempfile
 import streamlit as st
@@ -134,8 +135,10 @@ for message in st.session_state.messages:
         if "sources" in message and message["sources"]:
             with st.expander("🔍 View Source Quotes"):
                 for idx, src in enumerate(message["sources"], 1):
-                    st.markdown(f"**Source {idx}** (Page {src.metadata.get('page', 'N/A') if 'page' in src.metadata else 'Text'}):")
-                    st.quote(src.page_content)
+                    page_num = src.metadata.get('page')
+                    page_str = f"Page {page_num + 1}" if page_num is not None else "Text"
+                    st.markdown(f"**Source {idx}** ({page_str}):")
+                    st.markdown(f"> {src.page_content}")
 
 # Accept user input
 if prompt := st.chat_input("Ask a question about the academic policy (e.g., What is the attendance requirement?)"):
@@ -192,9 +195,10 @@ if prompt := st.chat_input("Ask a question about the academic policy (e.g., What
                     if source_docs:
                         with st.expander("🔍 View Source Quotes"):
                             for idx, doc in enumerate(source_docs, 1):
-                                page_info = f"Page {doc.metadata.get('page', 'N/A') + 1}" if 'page' in doc.metadata else "Document Text"
+                                page_num = doc.metadata.get('page')
+                                page_info = f"Page {page_num + 1}" if page_num is not None else "Document Text"
                                 st.markdown(f"**Source {idx}** ({page_info}):")
-                                st.quote(doc.page_content)
+                                st.markdown(f"> {doc.page_content}")
 
                     # Save assistant message with sources
                     st.session_state.messages.append({
